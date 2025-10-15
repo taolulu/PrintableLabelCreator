@@ -13,15 +13,18 @@ export function Label({
   projectName = "Lyra Project",
   title = "高端商务礼盒",
   imageUrl = "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&h=400&fit=crop",
+  hideBorders = false,
 }: LabelProps) {
   return (
     <div 
-      className="bg-white border border-gray-400 flex"
+      className="bg-white flex"
       style={{ 
         width: '105mm', 
         height: '49.5mm',
         padding: '4mm',
-        alignItems: 'center'
+        alignItems: 'center',
+        boxSizing: 'border-box',
+        border: hideBorders ? 'none' : '1px solid #9ca3af', // gray-400
       }}
     >
       {/* 左侧文本区域 */}
@@ -53,13 +56,13 @@ export function Label({
           </div>
           
           {/* 装饰分隔符 */}
-          <div className="flex items-center" style={{ marginTop: '16px' }}>
+          <div className="flex items-center" style={{ marginTop: '12px' }}>
             <div className="flex-1 h-px bg-[#999999]" />
           </div>
           
           {/* 第二行：大字号文本 */}
-          <div className="mt-2">
-            <h2 className="text-3xl text-gray-900 tracking-tight">{title}</h2>
+          <div>
+            <h2 className="text-gray-900 tracking-tight" style={{ fontSize: '22px', marginTop: '12px', marginBottom: '0px' }}>{title}</h2>
           </div>
         </div>
       </div>
@@ -67,10 +70,11 @@ export function Label({
       {/* 右侧图片区域 */}
       <div className="flex items-center justify-center">
         <div 
-          className="bg-gray-100 border border-gray-300 flex items-center justify-center overflow-hidden"
+          className="bg-gray-100 flex items-center justify-center overflow-hidden"
           style={{
             width: 'calc(49.5mm - 12mm)',
-            height: 'calc(49.5mm - 12mm)'
+            height: 'calc(49.5mm - 12mm)',
+            border: hideBorders ? 'none' : '1px solid #d1d5db', // gray-300
           }}
         >
           <ImageWithFallback 
