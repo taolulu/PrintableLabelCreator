@@ -62,12 +62,16 @@ export default function App() {
   };
 
   const handleUpdateSelectedLabel = (
-    updatedProps: Partial<Omit<IndividualLabel, "id">>
+    updatedProps: Partial<Omit<IndividualLabel, "id">>,
+    id?: string
   ) => {
-    if (!selectedLabelId) return;
-    setLabels(
-      labels.map((label) =>
-        label.id === selectedLabelId ? { ...label, ...updatedProps } : label
+    const targetId = id ?? selectedLabelId;
+    if (!targetId) return;
+  // (no debug log in production)
+    // Use functional update to avoid stale closures when updating labels
+    setLabels((prev) =>
+      prev.map((label) =>
+        label.id === targetId ? { ...label, ...updatedProps } : label
       )
     );
   };
@@ -76,15 +80,26 @@ export default function App() {
     window.print();
   };
 
+  // Keep a ref to latest labels so we can revoke object URLs on unmount only.
+  const labelsRef = useRef<IndividualLabel[]>(labels);
+  useEffect(() => {
+    labelsRef.current = labels;
+  }, [labels]);
+
   useEffect(() => {
     return () => {
-      labels.forEach((label) => {
+      // On unmount, revoke any blob URLs that were created during the session.
+      labelsRef.current.forEach((label) => {
         if (label.imageUrl && label.imageUrl.startsWith("blob:")) {
-          URL.revokeObjectURL(label.imageUrl);
+          try {
+            URL.revokeObjectURL(label.imageUrl);
+          } catch (e) {
+            // ignore
+          }
         }
       });
     };
-  }, [labels]);
+  }, []);
 
   return (
     <main className="bg-slate-100 min-h-screen w-full p-4 sm:p-8">
@@ -112,7 +127,7 @@ export default function App() {
                 {labels.map((label) => (
                   <div
                     key={label.id}
-                    ref={(el) => (labelListRefs.current[label.id] = el)}
+                    ref={(el) => { labelListRefs.current[label.id] = el; }}
                     className={`group p-3 rounded-lg mb-2 cursor-pointer flex justify-between items-center transition-colors ${
                       selectedLabelId === label.id
                         ? "bg-blue-100 shadow-inner"
@@ -192,6 +207,7 @@ export default function App() {
                       projectName={projectName}
                       title={label.title}
                       imageUrl={label.imageUrl}
+                      id={label.id}
                       isSelected={label.id === selectedLabelId}
                       onClick={() => setSelectedLabelId(label.id)}
                     />

@@ -9,9 +9,11 @@ export interface LabelProps {
   hideBorders?: boolean;
   isSelected?: boolean;
   onClick?: () => void;
+  id?: string;
 }
 
 export function Label({
+  id,
   projectName = "Lyra Project",
   title = "<p>高端商务礼盒</p>",
   imageUrl = "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&h=400&fit=crop",
@@ -19,6 +21,7 @@ export function Label({
   isSelected = false,
   onClick,
 }: LabelProps) {
+  // (no debug log in production)
   return (
     <div
       onClick={onClick}
