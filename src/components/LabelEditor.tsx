@@ -142,11 +142,15 @@ export function LabelEditor({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (selectedLabel.imageUrl && selectedLabel.imageUrl.startsWith("blob:")) {
-        URL.revokeObjectURL(selectedLabel.imageUrl);
-      }
-  const newImageUrl = URL.createObjectURL(file);
-  updateSelectedLabel({ imageUrl: newImageUrl }, selectedLabel.id);
+      // Read file as Data URL so it persists across page reloads
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string | null;
+        if (result) {
+          updateSelectedLabel({ imageUrl: result }, selectedLabel.id);
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
