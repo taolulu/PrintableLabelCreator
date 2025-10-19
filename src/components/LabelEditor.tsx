@@ -107,8 +107,8 @@ export function LabelEditor({
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
       FontSizeMark,
+      StarterKit,
     ],
     content: selectedLabel.title,
     onUpdate: ({ editor }) => {
@@ -141,8 +141,19 @@ export function LabelEditor({
     setFontSize(value);
     updateSelectedLabel({ titleFontSize: value }, selectedLabel.id);
     if (editor) {
-      // apply the font-size mark to the current selection
-      editor.chain().focus().setMark('fontSize', { size: `${value}px` }).run();
+      try {
+        const hasMark = Boolean(editor.schema.marks['fontSize']);
+        if (hasMark) {
+          // apply the font-size mark to the current selection
+          editor.chain().focus().setMark('fontSize', { size: `${value}px` }).run();
+        } else {
+          // eslint-disable-next-line no-console
+          console.warn('FontSize mark not registered on editor.schema; skipping setMark');
+        }
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn('Failed to apply fontSize mark', e);
+      }
     }
   }
 
