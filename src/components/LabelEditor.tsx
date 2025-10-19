@@ -10,7 +10,7 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
   }
 
   return (
-    <div className="flex gap-2 border border-gray-300 bg-white rounded-t-lg p-2">
+    <div className="flex gap-2 bg-slate-50 p-2 border-b border-gray-300">
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
@@ -53,7 +53,7 @@ export function LabelEditor({
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl m-5 focus:outline-none',
+        class: 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl p-4 focus:outline-none',
       },
     },
   });
@@ -98,7 +98,7 @@ export function LabelEditor({
 
         <div className="grid gap-2">
           <label className="font-semibold text-sm">Label Title</label>
-          <div className="border border-gray-300 rounded-b-lg">
+          <div className="border border-gray-300 rounded-lg overflow-hidden">
             <Toolbar editor={editor} />
             <EditorContent editor={editor} />
           </div>
