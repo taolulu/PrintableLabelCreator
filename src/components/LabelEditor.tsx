@@ -42,6 +42,7 @@ export function LabelEditor({
   updateSelectedLabel,
 }: LabelEditorProps) {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [fontSize, setFontSize] = React.useState<number>(selectedLabel.titleFontSize ?? 18);
 
   const editor = useEditor({
     extensions: [
@@ -68,6 +69,11 @@ export function LabelEditor({
   updateSelectedLabel({ imageUrl: newImageUrl }, selectedLabel.id);
     }
   };
+
+  const handleFontSizeChange = (value: number) => {
+    setFontSize(value);
+    updateSelectedLabel({ titleFontSize: value }, selectedLabel.id);
+  }
 
   return (
     <div className="w-full max-w-md bg-white rounded-lg shadow-md">
@@ -105,6 +111,12 @@ export function LabelEditor({
         </div>
 
         <div className="grid gap-2">
+          <label className="font-semibold text-sm">Title Font Size</label>
+          <div className="flex items-center gap-3">
+            <input type="range" min={10} max={40} value={fontSize} onChange={(e) => handleFontSizeChange(Number(e.target.value))} />
+            <span className="w-12 text-right">{fontSize}px</span>
+          </div>
+
           <label htmlFor="image-upload" className="font-semibold text-sm">Label Image</label>
           <input type="file" accept="image/*" onChange={handleFileChange} ref={fileInputRef} className="hidden" />
           <button className="w-full p-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50 flex items-center justify-center gap-2" onClick={() => fileInputRef.current?.click()}>

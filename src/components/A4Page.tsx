@@ -41,6 +41,7 @@ export const A4Page: React.FC<A4PageProps> = ({ labels, projectName }) => {
               title={label.title}
               id={label.id}
               imageUrl={label.imageUrl}
+              titleFontSize={label.titleFontSize}
               hideBorders={true}
             />
           </div>

@@ -10,6 +10,7 @@ export interface LabelProps {
   isSelected?: boolean;
   onClick?: () => void;
   id?: string;
+  titleFontSize?: number;
 }
 
 export function Label({
@@ -20,6 +21,7 @@ export function Label({
   hideBorders = false,
   isSelected = false,
   onClick,
+  titleFontSize = 20,
 }: LabelProps) {
   // (no debug log in production)
   return (
@@ -59,7 +61,8 @@ export function Label({
 
           {/* Second row: large text */}
           <div 
-            className="prose prose-2xl tracking-tight text-gray-900"
+            className="tracking-tight text-gray-900"
+            style={{ fontSize: `${titleFontSize}px` }}
             dangerouslySetInnerHTML={{ __html: title }}
           />
         </div>

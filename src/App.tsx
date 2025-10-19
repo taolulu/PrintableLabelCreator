@@ -9,6 +9,7 @@ export interface IndividualLabel {
   id: string;
   title: string;
   imageUrl: string;
+  titleFontSize?: number;
 }
 
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
       title: "<p>Custom Collector's Edition</p>",
       imageUrl:
         "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&h=400&fit=crop",
+      titleFontSize: 20,
     },
   ]);
   const [selectedLabelId, setSelectedLabelId] = useState<string | null>(
@@ -48,7 +50,7 @@ export default function App() {
       return;
     }
     const newId = `label-${Date.now()}`;
-    const newLabel: IndividualLabel = { id: newId, title: "<p>New Label</p>", imageUrl: "" };
+  const newLabel: IndividualLabel = { id: newId, title: "<p>New Label</p>", imageUrl: "", titleFontSize: 18 };
     setLabels([...labels, newLabel]);
     setSelectedLabelId(newId);
   };
@@ -208,6 +210,7 @@ export default function App() {
                       title={label.title}
                       imageUrl={label.imageUrl}
                       id={label.id}
+                      titleFontSize={label.titleFontSize}
                       isSelected={label.id === selectedLabelId}
                       onClick={() => setSelectedLabelId(label.id)}
                     />
