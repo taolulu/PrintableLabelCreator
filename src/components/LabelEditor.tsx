@@ -2,6 +2,7 @@ import { IndividualLabel } from "../App";
 import React from "react";
 import { useEditor, EditorContent, Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import { Mark } from '@tiptap/core'
 
 // Toolbar Component for Tiptap with font-size control
 const Toolbar = ({ editor, fontSize, onFontSizeChange }: { editor: Editor | null, fontSize: number, onFontSizeChange: (v: number) => void }) => {
@@ -61,6 +62,32 @@ const Toolbar = ({ editor, fontSize, onFontSizeChange }: { editor: Editor | null
   );
 };
 
+// Simple font-size mark that stores font-size as inline style on a span
+const FontSizeMark = Mark.create({
+  name: 'fontSize',
+  addAttributes() {
+    return {
+      size: {
+        default: null,
+        parseHTML: (element: HTMLElement) => element.style.fontSize || null,
+        renderHTML: (attributes: any) => {
+          if (!attributes.size) return {};
+          return { style: `font-size: ${attributes.size}` };
+        },
+      },
+    }
+  },
+  parseHTML() {
+    return [
+      { tag: 'span' },
+    ]
+  },
+  renderHTML({ HTMLAttributes }: any) {
+    return ['span', HTMLAttributes, 0]
+  },
+  // Note: commands are applied through the editor API (editor.chain().setMark(...))
+})
+
 
 interface LabelEditorProps {
   projectName: string;
@@ -81,6 +108,7 @@ export function LabelEditor({
   const editor = useEditor({
     extensions: [
       StarterKit,
+      FontSizeMark,
     ],
     content: selectedLabel.title,
     onUpdate: ({ editor }) => {
@@ -112,6 +140,10 @@ export function LabelEditor({
   const handleFontSizeChange = (value: number) => {
     setFontSize(value);
     updateSelectedLabel({ titleFontSize: value }, selectedLabel.id);
+    if (editor) {
+      // apply the font-size mark to the current selection
+      editor.chain().focus().setMark('fontSize', { size: `${value}px` }).run();
+    }
   }
 
   return (
