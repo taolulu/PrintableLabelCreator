@@ -17,25 +17,24 @@ export function Label({
 }: LabelProps) {
   return (
     <div 
-      className="bg-white flex"
+      className="bg-white flex p-[4mm]"
       style={{ 
         width: '105mm', 
         height: '49.5mm',
-        padding: '4mm',
         alignItems: 'center',
         boxSizing: 'border-box',
         border: hideBorders ? 'none' : '1px solid #9ca3af', // gray-400
       }}
     >
       {/* 左侧文本区域 */}
-      <div className="flex-1 flex flex-col justify-center" style={{ paddingRight: '32px' }}>
+      <div className="flex-1 flex flex-col justify-center pr-8">
         <div className="flex flex-col">
           {/* 第一行：图标 + 小字号文本 */}
           <div className="flex items-center">
             <img 
               src={newLogoImage}
               alt="Logo"
-              className="flex-shrink-0"
+              className="shrink-0"
               style={{
                 width: '30px',
                 height: '30px',
