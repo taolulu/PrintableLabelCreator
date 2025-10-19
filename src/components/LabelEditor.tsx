@@ -145,7 +145,9 @@ export function LabelEditor({
           <label className="font-semibold text-sm">Label Title</label>
           <div className="border border-gray-300 rounded-lg overflow-hidden">
             <Toolbar editor={editor} fontSize={fontSize} onFontSizeChange={handleFontSizeChange} />
-            <EditorContent editor={editor} />
+            <div style={{ fontSize: `${fontSize}px` }} className="p-4">
+              <EditorContent editor={editor} />
+            </div>
           </div>
         </div>
 
