@@ -25,21 +25,31 @@ export function ImageWithFallback(props: React.ImgHTMLAttributes<HTMLImageElemen
   }, [src])
 
   if (!src) {
+    // Render an inline SVG placeholder when there is no src
     return (
-      <div className={`inline-block bg-gray-50 ${className ?? ''}`} style={style} />
+      <div className={`inline-flex items-center justify-center ${className ?? ''}`} style={style}>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+          <rect x="2" y="3" width="20" height="14" rx="2" stroke="#e5e7eb" strokeWidth="1.5" fill="none" />
+          <path d="M3 18c0-.552.448-1 1-1h16c.552 0 1 .448 1 1v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-1z" fill="#f9fafb"/>
+          <circle cx="8.5" cy="9.5" r="1.8" fill="#e5e7eb" />
+        </svg>
+      </div>
+    )
+  }
+  if (didError) {
+    // Render same SVG placeholder on load error
+    return (
+      <div className={`inline-flex items-center justify-center ${className ?? ''}`} style={style}>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+          <rect x="2" y="3" width="20" height="14" rx="2" stroke="#e5e7eb" strokeWidth="1.5" fill="none" />
+          <path d="M3 18c0-.552.448-1 1-1h16c.552 0 1 .448 1 1v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-1z" fill="#f9fafb"/>
+          <circle cx="8.5" cy="9.5" r="1.8" fill="#e5e7eb" />
+        </svg>
+      </div>
     )
   }
 
-  return didError ? (
-    <div
-      className={`inline-block bg-gray-100 text-center align-middle ${className ?? ''}`}
-      style={style}
-    >
-      <div className="flex items-center justify-center w-full h-full">
-        <img src={ERROR_IMG_SRC} alt="Error loading image" {...rest} data-original-url={src} />
-      </div>
-    </div>
-  ) : (
+  return (
     <img src={src} alt={alt} className={className} style={style} {...rest} onError={handleError} onLoad={handleLoad} />
   )
 }

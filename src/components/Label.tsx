@@ -68,7 +68,7 @@ export function Label({
       {/* Right image area */}
       <div className="flex items-center justify-center">
         <div
-          className={`bg-gray-50 flex items-center justify-center overflow-hidden rounded-md ${hideBorders ? '' : 'border border-gray-200'}`}
+          className={`flex items-center justify-center overflow-hidden rounded-md ${hideBorders ? '' : 'border border-gray-200'}`}
           style={{
             width: 'calc(49.5mm - 12mm)',
             height: 'calc(49.5mm - 12mm)',
