@@ -1,5 +1,4 @@
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-// We'll use a standard import for the logo now.
 import newLogoImage from "../assets/workshop-logo.png";
 
 // Define the props interface for type safety and clarity
@@ -7,6 +6,9 @@ export interface LabelProps {
   projectName?: string;
   title?: string;
   imageUrl?: string;
+  hideBorders?: boolean;
+  isSelected?: boolean;
+  onClick?: () => void;
 }
 
 export function Label({
@@ -14,69 +16,61 @@ export function Label({
   title = "高端商务礼盒",
   imageUrl = "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&h=400&fit=crop",
   hideBorders = false,
+  isSelected = false,
+  onClick,
 }: LabelProps) {
   return (
-    <div 
-      className="bg-white flex p-[4mm]"
-      style={{ 
-        width: '105mm', 
+    <div
+      onClick={onClick}
+      className={`bg-white flex p-[4mm] transition-all duration-150 ${hideBorders ? '' : 'border border-gray-300'} ${isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : ''} ${onClick ? 'cursor-pointer' : ''}`}
+      style={{
+        width: '105mm',
         height: '49.5mm',
-        alignItems: 'center',
         boxSizing: 'border-box',
-        border: hideBorders ? 'none' : '1px solid #9ca3af', // gray-400
       }}
     >
-      {/* 左侧文本区域 */}
+      {/* Left text area */}
       <div className="flex-1 flex flex-col justify-center pr-8">
-        <div className="flex flex-col">
-          {/* 第一行：图标 + 小字号文本 */}
-          <div className="flex items-center">
-            <img 
+        <div className="flex flex-col gap-3">
+          {/* First row: icon + small text */}
+          <div className="flex items-center gap-3">
+            <img
               src={newLogoImage}
               alt="Logo"
               className="shrink-0"
-              style={{
+              style={{ // Keep size style for precise mm control if needed
                 width: '30px',
                 height: '30px',
-                // A more versatile filter for dark logos
-                filter: 'brightness(0) saturate(100%)'
+                filter: 'brightness(0) saturate(100%)',
               }}
             />
-            <span 
-              className="text-sm text-gray-700 tracking-wide"
-              style={{
-                fontFamily: '"Cascadia Code", "Cascadia Mono", monospace',
-                fontStyle: 'italic',
-                marginLeft: '12px'
-              }}
+            <span
+              className="text-sm font-mono italic text-gray-600 tracking-wide"
             >
               {projectName}
             </span>
           </div>
-          
-          {/* 装饰分隔符 */}
-          <div className="flex items-center" style={{ marginTop: '12px' }}>
-            <div className="flex-1 h-px bg-[#999999]" />
-          </div>
-          
-          {/* 第二行：大字号文本 */}
+
+          {/* Decorative separator */}
+          <div className="border-t border-gray-200" />
+
+          {/* Second row: large text */}
           <div>
-            <h2 className="text-gray-900 tracking-tight" style={{ fontSize: '22px', marginTop: '12px', marginBottom: '0px' }}>{title}</h2>
+            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">{title}</h2>
           </div>
         </div>
       </div>
-      
-      {/* 右侧图片区域 */}
+
+      {/* Right image area */}
       <div className="flex items-center justify-center">
-        <div 
-          className="bg-gray-100 flex items-center justify-center overflow-hidden"
+        <div
+          className={`bg-gray-50 flex items-center justify-center overflow-hidden rounded-md ${hideBorders ? '' : 'border border-gray-200'}`}
           style={{
             width: 'calc(49.5mm - 12mm)',
             height: 'calc(49.5mm - 12mm)',
-            border: hideBorders ? 'none' : '1px solid #d1d5db', // gray-300
           }}
         >
-          <ImageWithFallback 
+          <ImageWithFallback
             src={imageUrl}
             alt="模型示意图"
             className="w-full h-full object-contain"
