@@ -3,14 +3,21 @@ import React from "react";
 import { useEditor, EditorContent, Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
-// Toolbar Component for Tiptap
-const Toolbar = ({ editor }: { editor: Editor | null }) => {
+// Toolbar Component for Tiptap with font-size control
+const Toolbar = ({ editor, fontSize, onFontSizeChange }: { editor: Editor | null, fontSize: number, onFontSizeChange: (v: number) => void }) => {
+  const [showSize, setShowSize] = React.useState(false);
+
+  React.useEffect(() => {
+    // close panel when editor changes
+    setShowSize(false);
+  }, [editor]);
+
   if (!editor) {
     return null;
   }
 
   return (
-    <div className="flex gap-2 bg-slate-50 p-2 border-b border-gray-300">
+    <div className="flex gap-2 bg-slate-50 p-2 border-b border-gray-300 items-center">
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
@@ -23,6 +30,33 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
         className={`px-3 py-1 rounded-md text-sm italic font-serif ${editor.isActive('italic') ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>
         I
       </button>
+
+      {/* Font size button */}
+      <div className="relative">
+        <button
+          onClick={() => setShowSize((s) => !s)}
+          className="px-3 py-1 rounded-md text-sm bg-gray-200 hover:bg-gray-300"
+          aria-haspopup="true"
+          aria-expanded={showSize}
+        >
+          {fontSize}px
+        </button>
+
+        {showSize && (
+          <div className="absolute z-10 mt-2 p-3 bg-white border rounded shadow-md" style={{ minWidth: 220 }}>
+            <div className="flex items-center gap-3">
+              <input
+                type="range"
+                min={10}
+                max={40}
+                value={fontSize}
+                onChange={(e) => onFontSizeChange(Number(e.target.value))}
+              />
+              <div className="w-12 text-right">{fontSize}px</div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -58,6 +92,11 @@ export function LabelEditor({
       },
     },
   });
+
+  // keep fontSize in sync when selectedLabel changes
+  React.useEffect(() => {
+    setFontSize(selectedLabel.titleFontSize ?? 18);
+  }, [selectedLabel]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -105,18 +144,12 @@ export function LabelEditor({
         <div className="grid gap-2">
           <label className="font-semibold text-sm">Label Title</label>
           <div className="border border-gray-300 rounded-lg overflow-hidden">
-            <Toolbar editor={editor} />
+            <Toolbar editor={editor} fontSize={fontSize} onFontSizeChange={handleFontSizeChange} />
             <EditorContent editor={editor} />
           </div>
         </div>
 
         <div className="grid gap-2">
-          <label className="font-semibold text-sm">Title Font Size</label>
-          <div className="flex items-center gap-3">
-            <input type="range" min={10} max={40} value={fontSize} onChange={(e) => handleFontSizeChange(Number(e.target.value))} />
-            <span className="w-12 text-right">{fontSize}px</span>
-          </div>
-
           <label htmlFor="image-upload" className="font-semibold text-sm">Label Image</label>
           <input type="file" accept="image/*" onChange={handleFileChange} ref={fileInputRef} className="hidden" />
           <button className="w-full p-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50 flex items-center justify-center gap-2" onClick={() => fileInputRef.current?.click()}>
