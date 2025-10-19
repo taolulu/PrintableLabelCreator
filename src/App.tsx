@@ -14,24 +14,60 @@ export interface IndividualLabel {
 
 export default function App() {
   const [projectName, setProjectName] = useState("Project Phoenix");
-  const [labels, setLabels] = useState<IndividualLabel[]>([
-    {
-      id: `label-${Date.now()}`,
-      title: "<p>Custom Collector's Edition</p>",
-      imageUrl:
-        "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&h=400&fit=crop",
-      titleFontSize: 20,
-    },
-  ]);
-  const [selectedLabelId, setSelectedLabelId] = useState<string | null>(
-    labels[0]?.id ?? null
-  );
+  const [labels, setLabels] = useState<IndividualLabel[]>([]);
+  const [selectedLabelId, setSelectedLabelId] = useState<string | null>(null);
   const [isPrintPreview, setIsPrintPreview] = useState(false);
 
   const labelListRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const selectedLabel = labels.find((label) => label.id === selectedLabelId);
   const MAX_LABELS = 12;
+
+  // Persistence key
+  const STORAGE_KEY = "plc:state:v1";
+
+  // Load persisted state on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const state = JSON.parse(raw) as { projectName?: string; labels?: IndividualLabel[]; selectedLabelId?: string };
+        if (state.labels && state.labels.length > 0) {
+          setLabels(state.labels);
+          setSelectedLabelId(state.selectedLabelId ?? state.labels[0].id);
+        } else {
+          // default
+          const initial = [{ id: `label-${Date.now()}`, title: "<p>Custom Collector's Edition</p>", imageUrl: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&h=400&fit=crop", titleFontSize: 20 }];
+          setLabels(initial);
+          setSelectedLabelId(initial[0].id);
+        }
+        if (state.projectName) setProjectName(state.projectName);
+      } else {
+        const initial = [{ id: `label-${Date.now()}`, title: "<p>Custom Collector's Edition</p>", imageUrl: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&h=400&fit=crop", titleFontSize: 20 }];
+        setLabels(initial);
+        setSelectedLabelId(initial[0].id);
+      }
+    } catch (e) {
+      // fallback to defaults
+      const initial = [{ id: `label-${Date.now()}`, title: "<p>Custom Collector's Edition</p>", imageUrl: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&h=400&fit=crop", titleFontSize: 20 }];
+      setLabels(initial);
+      setSelectedLabelId(initial[0].id);
+    }
+  }, []);
+
+  // Save to localStorage with debounce
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      try {
+        const payload = JSON.stringify({ projectName, labels, selectedLabelId });
+        localStorage.setItem(STORAGE_KEY, payload);
+      } catch (e) {
+        // ignore storage errors
+      }
+    }, 800);
+
+    return () => clearTimeout(handler);
+  }, [projectName, labels, selectedLabelId]);
 
   // Effect to scroll the selected label into view in the list
   useEffect(() => {
