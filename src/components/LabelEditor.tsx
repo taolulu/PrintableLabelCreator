@@ -3,6 +3,7 @@ import React from "react";
 import { useEditor, EditorContent, Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { Mark } from '@tiptap/core'
+import { saveImageBlob } from '../lib/idbImages';
 
 // Toolbar Component for Tiptap with font-size control
 const Toolbar = ({ editor, fontSize, onFontSizeChange }: { editor: Editor | null, fontSize: number, onFontSizeChange: (v: number) => void }) => {
@@ -142,15 +143,21 @@ export function LabelEditor({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Read file as Data URL so it persists across page reloads
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string | null;
-        if (result) {
-          updateSelectedLabel({ imageUrl: result }, selectedLabel.id);
+      // Prefer storing blob in IndexedDB and referencing via idb://<id>
+      (async () => {
+        try {
+          const id = await saveImageBlob(file);
+          updateSelectedLabel({ imageUrl: `idb://${id}` }, selectedLabel.id);
+        } catch (e) {
+          // fallback to data URL if idb fails
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result = reader.result as string | null;
+            if (result) updateSelectedLabel({ imageUrl: result }, selectedLabel.id);
+          };
+          reader.readAsDataURL(file);
         }
-      };
-      reader.readAsDataURL(file);
+      })();
     }
   };
 
