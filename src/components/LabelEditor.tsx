@@ -25,6 +25,19 @@ const Toolbar = ({ editor, fontSize, onFontSizeChange }: { editor: Editor | null
         className={`px-3 py-1 rounded-md text-sm font-bold ${editor.isActive('bold') ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>
         B
       </button>
+      {/* List controls */}
+      <button
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        className={`px-3 py-1 rounded-md text-sm ${editor?.isActive('bulletList') ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+      >
+        • List
+      </button>
+      <button
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        className={`px-3 py-1 rounded-md text-sm ${editor?.isActive('orderedList') ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+      >
+        1. List
+      </button>
       <button
         onClick={() => editor.chain().focus().toggleItalic().run()}
         disabled={!editor.can().chain().focus().toggleItalic().run()}
