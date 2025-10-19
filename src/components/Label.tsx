@@ -9,9 +9,11 @@ export interface LabelProps {
   hideBorders?: boolean;
   isSelected?: boolean;
   onClick?: () => void;
+  id?: string;
 }
 
 export function Label({
+  id,
   projectName = "Lyra Project",
   title = "<p>高端商务礼盒</p>",
   imageUrl = "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&h=400&fit=crop",
@@ -19,6 +21,7 @@ export function Label({
   isSelected = false,
   onClick,
 }: LabelProps) {
+  // (no debug log in production)
   return (
     <div
       onClick={onClick}
@@ -65,7 +68,7 @@ export function Label({
       {/* Right image area */}
       <div className="flex items-center justify-center">
         <div
-          className={`bg-gray-50 flex items-center justify-center overflow-hidden rounded-md ${hideBorders ? '' : 'border border-gray-200'}`}
+          className={`flex items-center justify-center overflow-hidden rounded-md ${hideBorders ? '' : 'border border-gray-200'}`}
           style={{
             width: 'calc(49.5mm - 12mm)',
             height: 'calc(49.5mm - 12mm)',

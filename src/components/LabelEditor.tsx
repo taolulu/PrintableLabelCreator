@@ -32,7 +32,7 @@ interface LabelEditorProps {
   projectName: string;
   setProjectName: (name: string) => void;
   selectedLabel: IndividualLabel;
-  updateSelectedLabel: (updatedProps: Partial<Omit<IndividualLabel, "id">>) => void;
+  updateSelectedLabel: (updatedProps: Partial<Omit<IndividualLabel, "id">>, id?: string) => void;
 }
 
 export function LabelEditor({
@@ -49,7 +49,7 @@ export function LabelEditor({
     ],
     content: selectedLabel.title,
     onUpdate: ({ editor }) => {
-      updateSelectedLabel({ title: editor.getHTML() });
+      updateSelectedLabel({ title: editor.getHTML() }, selectedLabel.id);
     },
     editorProps: {
       attributes: {
@@ -64,8 +64,8 @@ export function LabelEditor({
       if (selectedLabel.imageUrl && selectedLabel.imageUrl.startsWith("blob:")) {
         URL.revokeObjectURL(selectedLabel.imageUrl);
       }
-      const newImageUrl = URL.createObjectURL(file);
-      updateSelectedLabel({ imageUrl: newImageUrl });
+  const newImageUrl = URL.createObjectURL(file);
+  updateSelectedLabel({ imageUrl: newImageUrl }, selectedLabel.id);
     }
   };
 
