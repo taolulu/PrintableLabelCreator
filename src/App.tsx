@@ -3,6 +3,7 @@ import { Label } from "./components/Label";
 import { LabelEditor } from "./components/LabelEditor";
 
 import { A4Page } from "./components/A4Page";
+import { stripHtmlTags } from "./components/ui/utils";
 
 export interface IndividualLabel {
   id: string;
@@ -119,7 +120,7 @@ export default function App() {
                     }`}
                     onClick={() => setSelectedLabelId(label.id)}
                   >
-                    <span className="truncate flex-1 pr-2 font-medium text-gray-700">{label.title}</span>
+                    <span className="truncate flex-1 pr-2 font-medium text-gray-700">{stripHtmlTags(label.title)}</span>
                     <button
                       className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-full hover:bg-gray-200"
                       onClick={(e) => {
