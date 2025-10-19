@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Label } from "./components/Label";
 import { LabelEditor } from "./components/LabelEditor";
-
 import { A4Page } from "./components/A4Page";
 import { stripHtmlTags } from "./components/ui/utils";
+import { saveImageBlob, getImageBlob } from './lib/idbImages';
 
 export interface IndividualLabel {
   id: string;
@@ -12,74 +12,155 @@ export interface IndividualLabel {
   titleFontSize?: number;
 }
 
-export default function App() {
-  const [projectName, setProjectName] = useState("Project Phoenix");
-  const [labels, setLabels] = useState<IndividualLabel[]>([
-    {
-      id: `label-${Date.now()}`,
-      title: "<p>Custom Collector's Edition</p>",
-      imageUrl:
-        "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&h=400&fit=crop",
-      titleFontSize: 20,
-    },
-  ]);
-  const [selectedLabelId, setSelectedLabelId] = useState<string | null>(
-    labels[0]?.id ?? null
-  );
-  const [isPrintPreview, setIsPrintPreview] = useState(false);
+export default function App(): React.ReactElement {
+  const [projectName, setProjectName] = useState<string>("Project Phoenix");
+  const [labels, setLabels] = useState<IndividualLabel[]>([]);
+  const [selectedLabelId, setSelectedLabelId] = useState<string | null>(null);
+  const [isPrintPreview, setIsPrintPreview] = useState<boolean>(false);
 
   const labelListRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const selectedLabel = labels.find((label) => label.id === selectedLabelId);
+  const STORAGE_KEY = 'plc:state:v1';
   const MAX_LABELS = 12;
 
-  // Effect to scroll the selected label into view in the list
+  const selectedLabel = labels.find((l) => l.id === selectedLabelId) ?? null;
+
+  // Load persisted state
   useEffect(() => {
-    if (selectedLabelId) {
-      const selectedElement = labelListRefs.current[selectedLabelId];
-      selectedElement?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-      });
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as { projectName?: string; labels?: IndividualLabel[]; selectedLabelId?: string };
+        if (parsed.labels && parsed.labels.length) {
+          setLabels(parsed.labels);
+          setSelectedLabelId(parsed.selectedLabelId ?? parsed.labels[0].id);
+        } else {
+          const initial: IndividualLabel[] = [{ id: `label-${Date.now()}`, title: '<p>Custom Collector\'s Edition</p>', imageUrl: '', titleFontSize: 20 }];
+          setLabels(initial);
+          setSelectedLabelId(initial[0].id);
+        }
+        if (parsed.projectName) setProjectName(parsed.projectName);
+      } else {
+        const initial: IndividualLabel[] = [{ id: `label-${Date.now()}`, title: '<p>Custom Collector\'s Edition</p>', imageUrl: '', titleFontSize: 20 }];
+        setLabels(initial);
+        setSelectedLabelId(initial[0].id);
+      }
+    } catch (e) {
+      const initial: IndividualLabel[] = [{ id: `label-${Date.now()}`, title: '<p>Custom Collector\'s Edition</p>', imageUrl: '', titleFontSize: 20 }];
+      setLabels(initial);
+      setSelectedLabelId(initial[0].id);
     }
+  }, []);
+
+  // Persist with debounce
+  useEffect(() => {
+    const t = setTimeout(() => {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ projectName, labels, selectedLabelId })); } catch {}
+    }, 700);
+    return () => clearTimeout(t);
+  }, [projectName, labels, selectedLabelId]);
+
+  // Auto-scroll selected label into view
+  useEffect(() => {
+    if (!selectedLabelId) return;
+    const el = labelListRefs.current[selectedLabelId];
+    el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [selectedLabelId]);
 
   const handleAddLabel = () => {
-    if (labels.length >= MAX_LABELS) {
-      alert(`You can add a maximum of ${MAX_LABELS} labels.`);
-      return;
+    if (labels.length >= MAX_LABELS) return alert(`Max ${MAX_LABELS}`);
+    const id = `label-${Date.now()}`;
+    const l: IndividualLabel = { id, title: '<p>New Label</p>', imageUrl: '', titleFontSize: 18 };
+    setLabels((s) => [...s, l]);
+    setSelectedLabelId(id);
+  };
+
+  const handleDeleteLabel = (id: string) => {
+    setLabels((s) => s.filter((x) => x.id !== id));
+    setSelectedLabelId((cur) => (cur === id ? null : cur));
+  };
+
+  const handleUpdateSelectedLabel = (patch: Partial<Omit<IndividualLabel, 'id'>>, id?: string) => {
+    const target = id ?? selectedLabelId;
+    if (!target) return;
+    setLabels((s) => s.map((l) => (l.id === target ? { ...l, ...patch } : l)));
+  };
+
+  const handlePrint = () => window.print();
+
+  const blobToDataURL = (b: Blob) => new Promise<string>((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result as string);
+    r.onerror = rej;
+    r.readAsDataURL(b);
+  });
+
+  const exportProject = async () => {
+    try {
+      const labelsCopy = await Promise.all(
+        labels.map(async (l) => {
+          const copy = { ...l } as IndividualLabel;
+          if (copy.imageUrl?.startsWith('idb://')) {
+            const id = copy.imageUrl.replace('idb://', '');
+            try {
+              const blob = await getImageBlob(id);
+              if (blob) copy.imageUrl = await blobToDataURL(blob);
+              else copy.imageUrl = '';
+            } catch {
+              copy.imageUrl = '';
+            }
+          }
+          return copy;
+        })
+      );
+
+      const payload = { plcExportVersion: 1, projectName, labels: labelsCopy, selectedLabelId };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${(projectName || 'plc-export').replace(/[^a-z0-9-_.]/gi, '_').slice(0, 64)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      alert('Export failed');
     }
-    const newId = `label-${Date.now()}`;
-  const newLabel: IndividualLabel = { id: newId, title: "<p>New Label</p>", imageUrl: "", titleFontSize: 18 };
-    setLabels([...labels, newLabel]);
-    setSelectedLabelId(newId);
   };
 
-  const handleDeleteLabel = (idToDelete: string) => {
-    const newLabels = labels.filter((label) => label.id !== idToDelete);
-    setLabels(newLabels);
-    if (selectedLabelId === idToDelete) {
-      setSelectedLabelId(newLabels[0]?.id ?? null);
+  const handleImportFile = async (ev: React.ChangeEvent<HTMLInputElement>) => {
+    const file = ev.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text) as { projectName?: string; labels?: IndividualLabel[]; selectedLabelId?: string };
+      if (!parsed || !Array.isArray(parsed.labels)) return alert('Invalid file');
+      const restored = await Promise.all(parsed.labels.map(async (lab) => {
+        const copy = { ...lab } as IndividualLabel;
+        if (copy.imageUrl?.startsWith('data:')) {
+          try {
+            const resp = await fetch(copy.imageUrl);
+            const blob = await resp.blob();
+            const id = await saveImageBlob(blob);
+            copy.imageUrl = `idb://${id}`;
+          } catch { copy.imageUrl = ''; }
+        }
+        return copy;
+      }));
+      setProjectName(parsed.projectName ?? projectName);
+      setLabels(restored);
+      setSelectedLabelId(parsed.selectedLabelId ?? restored[0]?.id ?? null);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      alert('Import failed');
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
-  };
-
-  const handleUpdateSelectedLabel = (
-    updatedProps: Partial<Omit<IndividualLabel, "id">>,
-    id?: string
-  ) => {
-    const targetId = id ?? selectedLabelId;
-    if (!targetId) return;
-  // (no debug log in production)
-    // Use functional update to avoid stale closures when updating labels
-    setLabels((prev) =>
-      prev.map((label) =>
-        label.id === targetId ? { ...label, ...updatedProps } : label
-      )
-    );
-  };
-
-  const handlePrint = () => {
-    window.print();
   };
 
   // Keep a ref to latest labels so we can revoke object URLs on unmount only.
@@ -125,6 +206,11 @@ export default function App() {
           <div className="lg:col-span-1 flex flex-col gap-8">
             <div className="bg-white rounded-lg shadow-md p-4 flex flex-col gap-4">
               <h2 className="text-xl font-bold text-gray-800">My Labels</h2>
+              <div className="flex gap-2">
+                <button onClick={exportProject} className="flex-1 text-sm px-3 py-2 bg-white border rounded hover:bg-gray-50">Export</button>
+                <button onClick={() => fileInputRef.current?.click()} className="flex-1 text-sm px-3 py-2 bg-white border rounded hover:bg-gray-50">Import</button>
+                <input ref={fileInputRef} type="file" accept="application/json" onChange={handleImportFile} className="hidden" />
+              </div>
               <div className="flex-1 overflow-y-auto pr-2 -mr-2" style={{ maxHeight: "35vh" }}>
                 {labels.map((label) => (
                   <div
