@@ -13,7 +13,7 @@ export interface LabelProps {
 
 export function Label({
   projectName = "Lyra Project",
-  title = "高端商务礼盒",
+  title = "<p>高端商务礼盒</p>",
   imageUrl = "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&h=400&fit=crop",
   hideBorders = false,
   isSelected = false,
@@ -55,9 +55,10 @@ export function Label({
           <div className="border-t border-gray-200" />
 
           {/* Second row: large text */}
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">{title}</h2>
-          </div>
+          <div 
+            className="prose prose-2xl tracking-tight text-gray-900"
+            dangerouslySetInnerHTML={{ __html: title }}
+          />
         </div>
       </div>
 

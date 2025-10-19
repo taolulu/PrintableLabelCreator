@@ -15,7 +15,7 @@ export default function App() {
   const [labels, setLabels] = useState<IndividualLabel[]>([
     {
       id: `label-${Date.now()}`,
-      title: "Custom Collector's Edition",
+      title: "<p>Custom Collector's Edition</p>",
       imageUrl:
         "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&h=400&fit=crop",
     },
@@ -47,7 +47,7 @@ export default function App() {
       return;
     }
     const newId = `label-${Date.now()}`;
-    const newLabel: IndividualLabel = { id: newId, title: "New Label", imageUrl: "" };
+    const newLabel: IndividualLabel = { id: newId, title: "<p>New Label</p>", imageUrl: "" };
     setLabels([...labels, newLabel]);
     setSelectedLabelId(newId);
   };
