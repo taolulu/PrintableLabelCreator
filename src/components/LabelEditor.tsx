@@ -2,15 +2,23 @@ import { IndividualLabel } from "../App";
 import React from "react";
 import { useEditor, EditorContent, Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import { Mark } from '@tiptap/core'
 
-// Toolbar Component for Tiptap
-const Toolbar = ({ editor }: { editor: Editor | null }) => {
+// Toolbar Component for Tiptap with font-size control
+const Toolbar = ({ editor, fontSize, onFontSizeChange }: { editor: Editor | null, fontSize: number, onFontSizeChange: (v: number) => void }) => {
+  const [showSize, setShowSize] = React.useState(false);
+
+  React.useEffect(() => {
+    // close panel when editor changes
+    setShowSize(false);
+  }, [editor]);
+
   if (!editor) {
     return null;
   }
 
   return (
-    <div className="flex gap-2 bg-slate-50 p-2 border-b border-gray-300">
+    <div className="flex gap-2 bg-slate-50 p-2 border-b border-gray-300 items-center">
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
@@ -23,9 +31,62 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
         className={`px-3 py-1 rounded-md text-sm italic font-serif ${editor.isActive('italic') ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>
         I
       </button>
+
+      {/* Font size button */}
+      <div className="relative">
+        <button
+          onClick={() => setShowSize((s) => !s)}
+          className="px-3 py-1 rounded-md text-sm bg-gray-200 hover:bg-gray-300"
+          aria-haspopup="true"
+          aria-expanded={showSize}
+        >
+          {fontSize}px
+        </button>
+
+        {showSize && (
+          <div className="absolute z-10 mt-2 p-3 bg-white border rounded shadow-md" style={{ minWidth: 220 }}>
+            <div className="flex items-center gap-3">
+              <input
+                type="range"
+                min={10}
+                max={40}
+                value={fontSize}
+                onChange={(e) => onFontSizeChange(Number(e.target.value))}
+              />
+              <div className="w-12 text-right">{fontSize}px</div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
+
+// Simple font-size mark that stores font-size as inline style on a span
+const FontSizeMark = Mark.create({
+  name: 'fontSize',
+  addAttributes() {
+    return {
+      size: {
+        default: null,
+        parseHTML: (element: HTMLElement) => element.style.fontSize || null,
+        renderHTML: (attributes: any) => {
+          if (!attributes.size) return {};
+          return { style: `font-size: ${attributes.size}` };
+        },
+      },
+    }
+  },
+  parseHTML() {
+    return [
+      { tag: 'span' },
+    ]
+  },
+  renderHTML({ HTMLAttributes }: any) {
+    return ['span', HTMLAttributes, 0]
+  },
+  // Note: commands are applied through the editor API (editor.chain().setMark(...))
+})
 
 
 interface LabelEditorProps {
@@ -42,9 +103,11 @@ export function LabelEditor({
   updateSelectedLabel,
 }: LabelEditorProps) {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [fontSize, setFontSize] = React.useState<number>(selectedLabel.titleFontSize ?? 18);
 
   const editor = useEditor({
     extensions: [
+      FontSizeMark,
       StarterKit,
     ],
     content: selectedLabel.title,
@@ -58,6 +121,11 @@ export function LabelEditor({
     },
   });
 
+  // keep fontSize in sync when selectedLabel changes
+  React.useEffect(() => {
+    setFontSize(selectedLabel.titleFontSize ?? 18);
+  }, [selectedLabel]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -68,6 +136,33 @@ export function LabelEditor({
   updateSelectedLabel({ imageUrl: newImageUrl }, selectedLabel.id);
     }
   };
+
+  const handleFontSizeChange = (value: number) => {
+    setFontSize(value);
+    updateSelectedLabel({ titleFontSize: value }, selectedLabel.id);
+    // Try to apply the mark; if the editor schema isn't ready yet, retry a few times.
+    const applyFontSizeMark = (triesLeft = 5, delay = 50) => {
+      if (!editor) return;
+      try {
+        const hasMark = Boolean(editor.schema && editor.schema.marks && editor.schema.marks['fontSize']);
+        if (hasMark) {
+          editor.chain().focus().setMark('fontSize', { size: `${value}px` }).run();
+          return;
+        }
+      } catch (e) {
+        // swallow and retry
+      }
+
+      if (triesLeft > 0) {
+        setTimeout(() => applyFontSizeMark(triesLeft - 1, delay * 1.5), delay);
+      } else {
+        // eslint-disable-next-line no-console
+        console.warn('FontSize mark not available after retries; skipping setMark');
+      }
+    };
+
+    applyFontSizeMark();
+  }
 
   return (
     <div className="w-full max-w-md bg-white rounded-lg shadow-md">
@@ -99,8 +194,10 @@ export function LabelEditor({
         <div className="grid gap-2">
           <label className="font-semibold text-sm">Label Title</label>
           <div className="border border-gray-300 rounded-lg overflow-hidden">
-            <Toolbar editor={editor} />
-            <EditorContent editor={editor} />
+            <Toolbar editor={editor} fontSize={fontSize} onFontSizeChange={handleFontSizeChange} />
+            <div style={{ fontSize: `${fontSize}px` }} className="p-4">
+              <EditorContent editor={editor} />
+            </div>
           </div>
         </div>
 
