@@ -58,7 +58,8 @@ export function LabelEditor({
     },
     editorProps: {
       attributes: {
-        class: 'focus:outline-none',
+        // give the editable area modest padding so typed text doesn't touch the border
+        class: 'px-3 py-2 focus:outline-none',
       },
     },
   });
