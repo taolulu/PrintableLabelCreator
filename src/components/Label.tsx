@@ -21,7 +21,7 @@ export function Label({
   hideBorders = false,
   isSelected = false,
   onClick,
-  titleFontSize = 20,
+  titleFontSize = 16,
 }: LabelProps) {
   // (no debug log in production)
   return (
