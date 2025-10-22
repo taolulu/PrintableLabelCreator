@@ -34,13 +34,21 @@
 }
 
 /* Editor content constraints and text/image wrapping */
-.t-editor-content {
-  /* limit vertical size and allow scrolling when content is tall */
+/* Editable area: keep scroll when content overflows (used in the editor) */
+.t-editor-content-editable {
   max-height: 8rem; /* ~128px, adjust as needed */
   overflow: auto;
 }
 
-.t-editor-content img {
+/* Display-only area: hide overflow and remove scrollbars (used in preview/label render) */
+.t-editor-content-display {
+  max-height: 8rem;
+  overflow: hidden; /* hide excess content instead of scrolling */
+}
+
+/* Shared rules for images and wrapping */
+.t-editor-content-editable img,
+.t-editor-content-display img {
   max-width: 100%;
   height: auto;
   display: block;
@@ -48,29 +56,20 @@
 }
 
 /* Break long words and non-CJK text to avoid overflowing container */
-.t-editor-content,
-.t-editor-content * {
+.t-editor-content-editable,
+.t-editor-content-editable *,
+.t-editor-content-display,
+.t-editor-content-display * {
   word-break: break-word;
   overflow-wrap: anywhere;
 }
 
-/* Improve scrollbar visibility on mac/linux if needed (non-critical) */
-.t-editor-content::-webkit-scrollbar {
+/* Scrollbar styling only for editable area (non-critical) */
+.t-editor-content-editable::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
-.t-editor-content::-webkit-scrollbar-thumb {
+.t-editor-content-editable::-webkit-scrollbar-thumb {
   background: rgba(0,0,0,0.15);
   border-radius: 8px;
-}
-
-/* Display-only title truncation (no scrollbars) */
-.label-title-display {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  /* clamp to 3 lines by default; change the number as needed */
-  line-clamp: 3;
-  -webkit-line-clamp: 3;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }

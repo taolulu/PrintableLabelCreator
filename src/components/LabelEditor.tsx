@@ -112,7 +112,7 @@ export function LabelEditor({
 
         <div className="grid gap-2">
           <label className="font-semibold text-sm">Label Title</label>
-          <div className="border border-gray-300 rounded-lg min-h-48 t-editor-content">
+          <div className="border border-gray-300 rounded-lg min-h-48 t-editor-content-editable">
             <Toolbar editor={editor} titleFontSize={selectedLabel.titleFontSize} />
             <EditorContent editor={editor} />
           </div>

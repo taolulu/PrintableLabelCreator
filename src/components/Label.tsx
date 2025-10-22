@@ -61,7 +61,7 @@ export function Label({
 
           {/* Second row: large text */}
           <div 
-            className="label-title-display tracking-tight text-gray-900"
+            className="tracking-tight text-gray-900 t-editor-content-display"
             style={{ fontSize: `${titleFontSize}px` }}
             dangerouslySetInnerHTML={{ __html: title }}
           />
