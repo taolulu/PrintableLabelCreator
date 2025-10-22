@@ -63,3 +63,14 @@
   background: rgba(0,0,0,0.15);
   border-radius: 8px;
 }
+
+/* Display-only title truncation (no scrollbars) */
+.label-title-display {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  /* clamp to 3 lines by default; change the number as needed */
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
