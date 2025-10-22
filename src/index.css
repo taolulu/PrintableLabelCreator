@@ -35,10 +35,7 @@
 
 /* Editor content constraints and text/image wrapping */
 /* Editable area: keep scroll when content overflows (used in the editor) */
-.t-editor-content-editable {
-  max-height: 8rem; /* ~128px, adjust as needed */
-  overflow: auto;
-}
+
 
 /* Display-only area: hide overflow and remove scrollbars (used in preview/label render) */
 .t-editor-content-display {
