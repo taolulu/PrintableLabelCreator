@@ -58,7 +58,8 @@ export function LabelEditor({
     },
     editorProps: {
       attributes: {
-        class: 'p-4 focus:outline-none',
+        // give the editable area modest padding so typed text doesn't touch the border
+        class: 'px-3 py-2 focus:outline-none',
       },
     },
   });
@@ -111,7 +112,7 @@ export function LabelEditor({
 
         <div className="grid gap-2">
           <label className="font-semibold text-sm">Label Title</label>
-          <div className="border border-gray-300 rounded-lg min-h-48">
+          <div className="border border-gray-300 rounded-lg min-h-48 t-editor-content-editable" style={{ fontSize: `${selectedLabel.titleFontSize ?? 13}px` }}>
             <Toolbar editor={editor} titleFontSize={selectedLabel.titleFontSize} />
             <EditorContent editor={editor} />
           </div>

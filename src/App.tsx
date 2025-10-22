@@ -36,18 +36,18 @@ export default function App(): React.ReactElement {
           setLabels(parsed.labels);
           setSelectedLabelId(parsed.selectedLabelId ?? parsed.labels[0].id);
         } else {
-          const initial: IndividualLabel[] = [{ id: `label-${Date.now()}`, title: '<p>Custom Collector\'s Edition</p>', imageUrl: '', titleFontSize: 20 }];
+          const initial: IndividualLabel[] = [{ id: `label-${Date.now()}`, title: '<p>Custom Collector\'s Edition</p>', imageUrl: '', titleFontSize: 13 }];
           setLabels(initial);
           setSelectedLabelId(initial[0].id);
         }
         if (parsed.projectName) setProjectName(parsed.projectName);
       } else {
-        const initial: IndividualLabel[] = [{ id: `label-${Date.now()}`, title: '<p>Custom Collector\'s Edition</p>', imageUrl: '', titleFontSize: 20 }];
+  const initial: IndividualLabel[] = [{ id: `label-${Date.now()}`, title: '<p>Custom Collector\'s Edition</p>', imageUrl: '', titleFontSize: 13 }];
         setLabels(initial);
         setSelectedLabelId(initial[0].id);
       }
     } catch (e) {
-      const initial: IndividualLabel[] = [{ id: `label-${Date.now()}`, title: '<p>Custom Collector\'s Edition</p>', imageUrl: '', titleFontSize: 20 }];
+  const initial: IndividualLabel[] = [{ id: `label-${Date.now()}`, title: '<p>Custom Collector\'s Edition</p>', imageUrl: '', titleFontSize: 13 }];
       setLabels(initial);
       setSelectedLabelId(initial[0].id);
     }
@@ -71,7 +71,7 @@ export default function App(): React.ReactElement {
   const handleAddLabel = () => {
     if (labels.length >= MAX_LABELS) return alert(`Max ${MAX_LABELS}`);
     const id = `label-${Date.now()}`;
-    const l: IndividualLabel = { id, title: '<p>New Label</p>', imageUrl: '', titleFontSize: 18 };
+  const l: IndividualLabel = { id, title: '<p>New Label</p>', imageUrl: '', titleFontSize: 13 };
     setLabels((s) => [...s, l]);
     setSelectedLabelId(id);
   };

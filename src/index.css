@@ -32,3 +32,41 @@
 .t-editor-content ol {
   list-style-type: decimal;
 }
+
+/* Editor content constraints and text/image wrapping */
+/* Editable area: keep scroll when content overflows (used in the editor) */
+
+
+/* Display-only area: hide overflow and remove scrollbars (used in preview/label render) */
+.t-editor-content-display {
+  max-height: 8rem;
+  overflow: hidden; /* hide excess content instead of scrolling */
+}
+
+/* Shared rules for images and wrapping */
+.t-editor-content-editable img,
+.t-editor-content-display img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+/* Break long words and non-CJK text to avoid overflowing container */
+.t-editor-content-editable,
+.t-editor-content-editable *,
+.t-editor-content-display,
+.t-editor-content-display * {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* Scrollbar styling only for editable area (non-critical) */
+.t-editor-content-editable::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.t-editor-content-editable::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 8px;
+}

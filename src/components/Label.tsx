@@ -21,7 +21,7 @@ export function Label({
   hideBorders = false,
   isSelected = false,
   onClick,
-  titleFontSize = 20,
+  titleFontSize = 13,
 }: LabelProps) {
   // (no debug log in production)
   return (
@@ -35,8 +35,8 @@ export function Label({
       }}
     >
       {/* Left text area */}
-      <div className="flex-1 flex flex-col justify-center pr-8">
-        <div className="flex flex-col gap-3">
+      <div className="flex-1 flex flex-col justify-center pr-4">
+        <div className="flex flex-col gap-1.5">
           {/* First row: icon + small text */}
           <div className="flex items-center gap-3">
             <img
@@ -61,7 +61,7 @@ export function Label({
 
           {/* Second row: large text */}
           <div 
-            className="tracking-tight text-gray-900 t-editor-content"
+            className="tracking-tight text-gray-900 t-editor-content-display"
             style={{ fontSize: `${titleFontSize}px` }}
             dangerouslySetInnerHTML={{ __html: title }}
           />
