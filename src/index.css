@@ -32,3 +32,34 @@
 .t-editor-content ol {
   list-style-type: decimal;
 }
+
+/* Editor content constraints and text/image wrapping */
+.t-editor-content {
+  /* limit vertical size and allow scrolling when content is tall */
+  max-height: 8rem; /* ~128px, adjust as needed */
+  overflow: auto;
+}
+
+.t-editor-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+/* Break long words and non-CJK text to avoid overflowing container */
+.t-editor-content,
+.t-editor-content * {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* Improve scrollbar visibility on mac/linux if needed (non-critical) */
+.t-editor-content::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.t-editor-content::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 8px;
+}

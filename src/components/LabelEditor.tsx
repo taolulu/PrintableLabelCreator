@@ -58,7 +58,7 @@ export function LabelEditor({
     },
     editorProps: {
       attributes: {
-        class: 'p-4 focus:outline-none',
+        class: 'focus:outline-none',
       },
     },
   });
@@ -111,7 +111,7 @@ export function LabelEditor({
 
         <div className="grid gap-2">
           <label className="font-semibold text-sm">Label Title</label>
-          <div className="border border-gray-300 rounded-lg min-h-48">
+          <div className="border border-gray-300 rounded-lg min-h-48 t-editor-content">
             <Toolbar editor={editor} titleFontSize={selectedLabel.titleFontSize} />
             <EditorContent editor={editor} />
           </div>
