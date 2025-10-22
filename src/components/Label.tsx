@@ -35,8 +35,8 @@ export function Label({
       }}
     >
       {/* Left text area */}
-      <div className="flex-1 flex flex-col justify-center pr-8">
-        <div className="flex flex-col gap-3">
+      <div className="flex-1 flex flex-col justify-center pr-4">
+        <div className="flex flex-col gap-1.5">
           {/* First row: icon + small text */}
           <div className="flex items-center gap-3">
             <img
