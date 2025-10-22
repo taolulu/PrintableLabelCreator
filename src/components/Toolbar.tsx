@@ -7,7 +7,7 @@ export const Toolbar = ({ editor, titleFontSize }: { editor: Editor | null, titl
   }
 
   const [showSize, setShowSize] = React.useState(false);
-  const [fontSize, setFontSize] = React.useState(titleFontSize || 16);
+  const [fontSize, setFontSize] = React.useState(titleFontSize || 13);
 
   React.useEffect(() => {
     if (titleFontSize) {
@@ -59,7 +59,7 @@ export const Toolbar = ({ editor, titleFontSize }: { editor: Editor | null, titl
             <div className="flex items-center gap-3">
               <input
                 type="range"
-                min={16}
+                min={13}
                 max={24}
                 value={fontSize}
                 onChange={(e) => handleFontSizeChange(Number(e.target.value))}
