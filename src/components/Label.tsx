@@ -27,7 +27,7 @@ export function Label({
   return (
     <div
       onClick={onClick}
-      className={`bg-white flex p-[4mm] transition-all duration-150 ${hideBorders ? '' : 'border border-gray-300'} ${isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : ''} ${onClick ? 'cursor-pointer' : ''}`}
+  className={`bg-white flex p-[4mm] transition-all duration-150 ${hideBorders ? '' : 'border border-dashed border-gray-300'} ${isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : ''} ${onClick ? 'cursor-pointer' : ''}`}
       style={{
         width: '105mm',
         height: '49.5mm',
@@ -71,7 +71,7 @@ export function Label({
       {/* Right image area */}
       <div className="flex items-center justify-center">
         <div
-          className={`flex items-center justify-center overflow-hidden rounded-md ${hideBorders ? '' : 'border border-gray-200'}`}
+          className={`flex items-center justify-center overflow-hidden rounded-md ${hideBorders ? '' : 'border border-dashed border-gray-200'}`}
           style={{
             width: 'calc(49.5mm - 12mm)',
             height: 'calc(49.5mm - 12mm)',
