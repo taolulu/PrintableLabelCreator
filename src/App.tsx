@@ -291,15 +291,49 @@ export default function App(): React.ReactElement {
                       zIndex: label.id === selectedLabelId ? 10 : 1, // Elevate selected label
                     }}
                   >
-                    <Label
-                      projectName={projectName}
-                      title={label.title}
-                      imageUrl={label.imageUrl}
-                      id={label.id}
-                      titleFontSize={label.titleFontSize}
-                      isSelected={label.id === selectedLabelId}
-                      onClick={() => setSelectedLabelId(label.id)}
-                    />
+                    <div className="relative">
+                      <Label
+                        projectName={projectName}
+                        title={label.title}
+                        imageUrl={label.imageUrl}
+                        id={label.id}
+                        titleFontSize={label.titleFontSize}
+                        isSelected={label.id === selectedLabelId}
+                        onClick={() => setSelectedLabelId(label.id)}
+                      />
+
+                      {/* Overlay controls: copy and delete */}
+                      <div className="absolute top-2 right-2 flex gap-2">
+                        <button
+                          title="Copy label"
+                          className="bg-white p-1 rounded shadow-sm hover:bg-gray-100"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // copy label
+                            const newId = `label-${Date.now()}`;
+                            const copy = { ...label, id: newId };
+                            setLabels((s) => {
+                              const idx = s.findIndex((x) => x.id === label.id);
+                              const arr = [...s];
+                              arr.splice(idx + 1, 0, copy);
+                              return arr;
+                            });
+                          }}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        </button>
+                        <button
+                          title="Delete label"
+                          className="bg-white p-1 rounded shadow-sm hover:bg-gray-100"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteLabel(label.id);
+                          }}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 );
               })}
