@@ -17,6 +17,7 @@ export default function App(): React.ReactElement {
   const [labels, setLabels] = useState<IndividualLabel[]>([]);
   const [selectedLabelId, setSelectedLabelId] = useState<string | null>(null);
   const [isPrintPreview, setIsPrintPreview] = useState<boolean>(false);
+  const [printCopies, setPrintCopies] = useState<number>(1);
 
   const labelListRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -28,9 +29,40 @@ export default function App(): React.ReactElement {
 
   // helper: split labels into pages of 12
   const pageSize = 12;
+  
+  // Create expanded labels array based on print copies
+  const expandedLabels = React.useMemo(() => {
+    if (printCopies <= 1) return labels;
+    
+    const expanded: IndividualLabel[] = [];
+    for (let copy = 0; copy < printCopies; copy++) {
+      labels.forEach((label) => {
+        expanded.push({
+          ...label,
+          id: `${label.id}-copy-${copy}` // Ensure unique IDs for each copy
+        });
+      });
+    }
+    
+    // Fill up to complete pages (12 labels per page)
+    const remainder = expanded.length % pageSize;
+    if (remainder > 0) {
+      const fillerCount = pageSize - remainder;
+      const lastLabel = labels[labels.length - 1];
+      for (let i = 0; i < fillerCount; i++) {
+        expanded.push({
+          ...lastLabel,
+          id: `${lastLabel.id}-filler-${i}`
+        });
+      }
+    }
+    
+    return expanded;
+  }, [labels, printCopies]);
+  
   const pages: IndividualLabel[][] = [];
-  for (let i = 0; i < labels.length; i += pageSize) {
-    pages.push(labels.slice(i, i + pageSize));
+  for (let i = 0; i < expandedLabels.length; i += pageSize) {
+    pages.push(expandedLabels.slice(i, i + pageSize));
   }
 
   // keep currentPage in-range when labels/pages change
@@ -203,15 +235,42 @@ export default function App(): React.ReactElement {
     <main className="bg-slate-100 min-h-screen w-full p-4 sm:p-8">
       {isPrintPreview ? (
         <div id="print-area" className="flex flex-col items-center gap-8">
-          <div className="flex justify-center gap-4 print-hidden">
+          <div className="flex justify-center gap-4 print-hidden items-center">
             <button onClick={() => setIsPrintPreview(false)} className="px-4 py-2 bg-white border rounded-md shadow-sm hover:bg-gray-50 text-gray-800 font-semibold">
               Back to Editor
             </button>
+            <div className="flex items-center gap-2 bg-white px-4 py-2 border rounded-md shadow-sm">
+              <label htmlFor="print-copies" className="text-sm text-gray-600 font-medium">份数:</label>
+              <input
+                id="print-copies"
+                type="number"
+                min="1"
+                max="100"
+                value={printCopies}
+                onChange={(e) => setPrintCopies(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
+                className="w-16 p-1 border rounded text-sm text-center"
+              />
+            </div>
             <button onClick={handlePrint} className="px-4 py-2 bg-blue-600 text-white font-semibold border rounded-md shadow-sm hover:bg-blue-700">
               Print
             </button>
           </div>
           {/* Page navigator for multi-page preview (screen only) */}
+          {(pages.length > 1 || printCopies > 1) && (
+            <div className="col-span-full flex items-center justify-center gap-4 mt-4 print-hidden bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
+              <div className="text-sm text-blue-800">
+                总标签数: {expandedLabels.length} 个 | 总页数: {pages.length} 页
+                {printCopies > 1 && (
+                  <span className="ml-2 text-blue-600">
+                    ({labels.length} 个标签 × {printCopies} 份
+                    {expandedLabels.length > labels.length * printCopies && 
+                      ` + ${expandedLabels.length - labels.length * printCopies} 个填充`}
+                    )
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
           {pages.length > 1 && (
             <div className="col-span-full flex items-center justify-center gap-4 mt-4 print-hidden">
               <button
