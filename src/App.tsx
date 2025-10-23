@@ -264,9 +264,7 @@ export default function App(): React.ReactElement {
           </div>
 
           {/* Right side: All Labels Preview */}
-          <div className="lg:col-span-2 bg-gray-50 rounded-lg shadow-inner p-4 sm:p-8 overflow-y-auto flex justify-center items-start"
-            style={{ maxHeight: "calc(100vh - 64px)" }}
-          >
+          <div className="lg:col-span-2 bg-gray-50 rounded-lg shadow-inner p-4 sm:p-8 overflow-y-auto flex justify-center items-start">
             <div
               className="origin-top"
               style={{
