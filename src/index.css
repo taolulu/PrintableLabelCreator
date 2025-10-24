@@ -132,8 +132,8 @@
   }
   
   .responsive-editor-sidebar {
-    width: 300px;
-    min-width: 300px;
+    width: 360px;
+    min-width: 360px;
     flex-shrink: 0;
     min-height: 600px;
     transition: all 0.3s ease-in-out;
@@ -208,4 +208,11 @@
 .responsive-editor-preview {
   overflow-x: auto;
   overflow-y: auto;
+}
+
+/* 标签预览区域适配容器宽度 */
+.responsive-editor-preview .origin-top {
+  width: 100% !important;
+  max-width: 100%;
+  box-sizing: border-box;
 }
