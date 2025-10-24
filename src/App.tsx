@@ -232,36 +232,37 @@ export default function App(): React.ReactElement {
   }, []);
 
   return (
-    <main className="bg-slate-100 min-h-screen w-full p-4 sm:p-8">
+    <main className="bg-slate-100 min-h-screen w-full p-4 sm:p-8 print:p-0">
       {isPrintPreview ? (
-        <div id="print-area" className="flex flex-col items-center gap-8">
-          <div className="flex justify-center gap-4 print-hidden items-center">
-            <button onClick={() => setIsPrintPreview(false)} className="px-4 py-2 bg-white border rounded-md shadow-sm hover:bg-gray-50 text-gray-800 font-semibold">
-              Back to Editor
+        <div className="bg-gray-100 min-h-screen p-4 sm:p-6 lg:p-8 print:p-0">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 bg-white p-4 rounded-lg shadow-sm print-hidden">
+            <button onClick={() => setIsPrintPreview(false)} className="px-4 py-2 bg-gray-600 text-white font-semibold border rounded-md shadow-sm hover:bg-gray-700 touch-manipulation">
+              ← Back to Editor
             </button>
-            <div className="flex items-center gap-2 bg-white px-4 py-2 border rounded-md shadow-sm">
-              <label htmlFor="print-copies" className="text-sm text-gray-600 font-medium">份数:</label>
-              <input
-                id="print-copies"
-                type="number"
-                min="1"
-                max="100"
-                value={printCopies}
-                onChange={(e) => setPrintCopies(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
-                className="w-16 p-1 border rounded text-sm text-center"
-              />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700">Quantity:</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={100}
+                  value={printCopies}
+                  onChange={(e) => setPrintCopies(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
+                  className="w-16 p-1 border rounded text-sm text-center touch-manipulation"
+                />
+              </div>
+              <button onClick={handlePrint} className="px-4 py-2 bg-blue-600 text-white font-semibold border rounded-md shadow-sm hover:bg-blue-700 touch-manipulation">
+                Print
+              </button>
             </div>
-            <button onClick={handlePrint} className="px-4 py-2 bg-blue-600 text-white font-semibold border rounded-md shadow-sm hover:bg-blue-700">
-              Print
-            </button>
           </div>
           {/* Page navigator for multi-page preview (screen only) */}
           {(pages.length > 1 || printCopies > 1) && (
-            <div className="col-span-full flex items-center justify-center gap-4 mt-4 print-hidden bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
-              <div className="text-sm text-blue-800">
+            <div className="flex flex-col gap-4 mb-6 print-hidden bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <div className="text-sm text-blue-800 text-center">
                 总标签数: {expandedLabels.length} 个 | 总页数: {pages.length} 页
                 {printCopies > 1 && (
-                  <span className="ml-2 text-blue-600">
+                  <span className="block sm:inline sm:ml-2 text-blue-600 mt-1 sm:mt-0">
                     ({labels.length} 个标签 × {printCopies} 份
                     {expandedLabels.length > labels.length * printCopies && 
                       ` + ${expandedLabels.length - labels.length * printCopies} 个填充`}
@@ -272,24 +273,26 @@ export default function App(): React.ReactElement {
             </div>
           )}
           {pages.length > 1 && (
-            <div className="col-span-full flex items-center justify-center gap-4 mt-4 print-hidden">
-              <button
-                className="px-3 py-1 bg-white border rounded disabled:opacity-50"
-                onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
-                disabled={currentPage === 0}
-              >
-                Prev
-              </button>
-              <div>
-                Page {currentPage + 1} / {pages.length}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6 print-hidden bg-white p-4 rounded-lg shadow-sm">
+              <div className="flex items-center gap-2">
+                <button
+                  className="px-3 py-1 bg-white border rounded disabled:opacity-50 touch-manipulation"
+                  onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+                  disabled={currentPage === 0}
+                >
+                  Prev
+                </button>
+                <div className="text-sm font-medium">
+                  Page {currentPage + 1} / {pages.length}
+                </div>
+                <button
+                  className="px-3 py-1 bg-white border rounded disabled:opacity-50 touch-manipulation"
+                  onClick={() => setCurrentPage((p) => Math.min(pages.length - 1, p + 1))}
+                  disabled={currentPage === pages.length - 1}
+                >
+                  Next
+                </button>
               </div>
-              <button
-                className="px-3 py-1 bg-white border rounded disabled:opacity-50"
-                onClick={() => setCurrentPage((p) => Math.min(pages.length - 1, p + 1))}
-                disabled={currentPage === pages.length - 1}
-              >
-                Next
-              </button>
               <div className="flex items-center gap-2">
                 <label className="text-sm text-gray-600">Go to</label>
                 <input
@@ -301,32 +304,36 @@ export default function App(): React.ReactElement {
                     const v = Number(e.target.value) - 1;
                     if (!isNaN(v)) setCurrentPage(Math.max(0, Math.min(pages.length - 1, v)));
                   }}
-                  className="w-16 p-1 border rounded text-sm"
+                  className="w-16 p-1 border rounded text-sm touch-manipulation"
                 />
               </div>
             </div>
           )}
 
           {/* Screen preview: show only the current A4 page */}
-          <div className="bg-white rounded-lg shadow-lg print-hidden">
-            <A4Page labels={pages[currentPage] ?? []} projectName={projectName} />
+          <div className="bg-white rounded-lg shadow-lg print-hidden overflow-auto">
+            <div className="flex justify-center p-4">
+              <div className="transform-gpu" style={{ transform: "scale(0.8)", transformOrigin: "top center" }}>
+                <A4Page labels={pages[currentPage] ?? []} projectName={projectName} />
+              </div>
+            </div>
           </div>
 
           {/* Print-only content: render all pages for printing (hidden on screen) */}
           <div className="hidden print:block">
             {pages.map((p, idx) => (
-              <div key={idx} style={{ pageBreakAfter: 'always' }} className="bg-white rounded-lg shadow-lg mb-6">
+              <div key={idx} style={{ pageBreakAfter: 'always' }} className="bg-white rounded-lg shadow-lg mb-6 print:shadow-none print:mb-0">
                 <A4Page labels={p} projectName={projectName} />
               </div>
             ))}
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <div className="flex flex-col xl:grid xl:grid-cols-3 gap-4 xl:gap-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Left side: Controls */}
-          <div className="lg:col-span-1 flex flex-col gap-8">
+          <div className="xl:col-span-1 flex flex-col gap-4 xl:gap-8">
             <div className="bg-white rounded-lg shadow-md p-4 flex flex-col gap-4">
-              <h2 className="text-xl font-bold text-gray-800">My Labels</h2>
+              <h2 className="text-lg xl:text-xl font-bold text-gray-800">My Labels</h2>
               <div className="flex gap-2">
                 <button onClick={exportProject} className="flex-1 text-sm px-3 py-2 bg-white border rounded hover:bg-gray-50">Export</button>
                 <button onClick={() => fileInputRef.current?.click()} className="flex-1 text-sm px-3 py-2 bg-white border rounded hover:bg-gray-50">Import</button>
@@ -350,27 +357,29 @@ export default function App(): React.ReactElement {
                 updateSelectedLabel={handleUpdateSelectedLabel}
               />
             ) : (
-              <div className="w-full text-center text-gray-500 bg-white p-8 rounded-lg shadow-md">
+              <div className="w-full text-center text-gray-500 bg-white p-6 xl:p-8 rounded-lg shadow-md">
                 Select a label to edit or add a new one.
               </div>
             )}
-             <button onClick={() => setIsPrintPreview(true)} className="w-full bg-blue-600 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors text-lg">
+             <button onClick={() => setIsPrintPreview(true)} className="w-full bg-blue-600 text-white font-bold py-3 xl:py-4 px-4 xl:px-6 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors text-base xl:text-lg">
               Go to Print Preview
             </button>
           </div>
 
           {/* Right side: All Labels Preview */}
-          <div className="lg:col-span-2 bg-gray-50 rounded-lg shadow-inner p-4 sm:p-8 overflow-visible flex flex-col items-center">
+          <div className="xl:col-span-2 bg-gray-50 rounded-lg shadow-inner p-4 sm:p-6 xl:p-8 overflow-auto flex flex-col items-center">
             <div
-              className="origin-top"
+              className="origin-top transform-gpu"
               style={{
                 position: "relative",
                 height: `${Math.max(1, Math.ceil((pages[currentPage]?.length ?? 0) / 2)) * 49.5}mm`,
                 width: `${2 * 105}mm`,
+                transform: "scale(0.6)",
+                transformOrigin: "top center",
               }}
             >
               {pages.length === 0 ? (
-                <div className="text-gray-500">No labels</div>
+                <div className="text-gray-500 text-center py-8 transform scale-[1.67]">No labels</div>
               ) : (
                 // render only current page
                 pages[currentPage].map((label, index) => {
@@ -404,7 +413,7 @@ export default function App(): React.ReactElement {
                         <div className="absolute top-2 right-2 flex gap-2">
                           <button
                             title="Copy label"
-                            className="bg-white p-1 rounded shadow-sm hover:bg-gray-100"
+                            className="bg-white p-1 rounded shadow-sm hover:bg-gray-100 touch-manipulation"
                             onClick={(e) => {
                               e.stopPropagation();
                               const newId = `label-${Date.now()}`;
@@ -425,7 +434,7 @@ export default function App(): React.ReactElement {
                           </button>
                           <button
                             title="Delete label"
-                            className="bg-white p-1 rounded shadow-sm hover:bg-gray-100"
+                            className="bg-white p-1 rounded shadow-sm hover:bg-gray-100 touch-manipulation"
                             onClick={(e) => {
                               e.stopPropagation();
                               setLabels((s) => {
@@ -470,26 +479,28 @@ export default function App(): React.ReactElement {
 
             {/* Editor preview bottom navigator (visible on screen, hidden in print) */}
             {pages.length > 1 && (
-              <div className="w-full flex items-center justify-center gap-4 mt-4 print-hidden">
-                <button
-                  className="px-3 py-1 bg-white border rounded disabled:opacity-50"
-                  onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
-                  disabled={currentPage === 0}
-                >
-                  Prev
-                </button>
-                <div>
-                  Page {currentPage + 1} / {pages.length}
-                </div>
-                <button
-                  className="px-3 py-1 bg-white border rounded disabled:opacity-50"
-                  onClick={() => setCurrentPage((p) => Math.min(pages.length - 1, p + 1))}
-                  disabled={currentPage === pages.length - 1}
-                >
-                  Next
-                </button>
+              <div className="w-full flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mt-4 print-hidden">
                 <div className="flex items-center gap-2">
-                  <label className="text-sm text-gray-600">Go to</label>
+                  <button
+                    className="px-3 py-1 bg-white border rounded disabled:opacity-50 touch-manipulation"
+                    onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+                    disabled={currentPage === 0}
+                  >
+                    Prev
+                  </button>
+                  <div className="text-sm sm:text-base">
+                    Page {currentPage + 1} / {pages.length}
+                  </div>
+                  <button
+                    className="px-3 py-1 bg-white border rounded disabled:opacity-50 touch-manipulation"
+                    onClick={() => setCurrentPage((p) => Math.min(pages.length - 1, p + 1))}
+                    disabled={currentPage === pages.length - 1}
+                  >
+                    Next
+                  </button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs sm:text-sm text-gray-600">Go to</label>
                   <input
                     type="number"
                     min={1}
@@ -499,7 +510,7 @@ export default function App(): React.ReactElement {
                       const v = Number(e.target.value) - 1;
                       if (!isNaN(v)) setCurrentPage(Math.max(0, Math.min(pages.length - 1, v)));
                     }}
-                    className="w-16 p-1 border rounded text-sm"
+                    className="w-12 sm:w-16 p-1 border rounded text-xs sm:text-sm"
                   />
                 </div>
               </div>

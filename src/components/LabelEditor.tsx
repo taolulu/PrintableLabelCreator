@@ -84,12 +84,12 @@ export function LabelEditor({
   };
 
   return (
-    <div className="w-full max-w-md bg-white rounded-lg shadow-md">
-      <div className="p-6">
-        <h3 className="text-xl font-bold">Label Editor</h3>
-        <p className="text-sm text-gray-500 mt-1">Edit the shared project name and the properties of the selected label.</p>
+    <div className="w-full max-w-none xl:max-w-md bg-white rounded-lg shadow-md">
+      <div className="p-4 xl:p-6">
+        <h3 className="text-lg xl:text-xl font-bold">Label Editor</h3>
+        <p className="text-xs xl:text-sm text-gray-500 mt-1">Edit the shared project name and the properties of the selected label.</p>
       </div>
-      <div className="p-6 pt-0 grid gap-6">
+      <div className="p-4 xl:p-6 pt-0 grid gap-4 xl:gap-6">
         <div className="grid gap-2">
           <label htmlFor="project-name" className="font-semibold text-sm">Project Name (Shared)</label>
           <input
@@ -97,7 +97,7 @@ export function LabelEditor({
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
             placeholder="e.g., Project Phoenix"
-            className="w-full p-2 border border-gray-300 rounded-md"
+            className="w-full p-2 xl:p-3 border border-gray-300 rounded-md text-sm xl:text-base touch-manipulation"
           />
         </div>
         
@@ -112,7 +112,7 @@ export function LabelEditor({
 
         <div className="grid gap-2">
           <label className="font-semibold text-sm">Label Title</label>
-          <div className="border border-gray-300 rounded-lg min-h-48 t-editor-content-editable" style={{ fontSize: `${selectedLabel.titleFontSize ?? 13}px` }}>
+          <div className="border border-gray-300 rounded-lg min-h-32 xl:min-h-48 t-editor-content-editable" style={{ fontSize: `${selectedLabel.titleFontSize ?? 13}px` }}>
             <Toolbar editor={editor} titleFontSize={selectedLabel.titleFontSize} />
             <EditorContent editor={editor} />
           </div>
@@ -121,7 +121,7 @@ export function LabelEditor({
         <div className="grid gap-2">
           <label htmlFor="image-upload" className="font-semibold text-sm">Label Image</label>
           <input type="file" accept="image/*" onChange={handleFileChange} ref={fileInputRef} className="hidden" />
-          <button className="w-full p-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50 flex items-center justify-center gap-2" onClick={() => fileInputRef.current?.click()}>
+          <button className="w-full p-3 xl:p-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50 flex items-center justify-center gap-2 touch-manipulation text-sm xl:text-base" onClick={() => fileInputRef.current?.click()}>
              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             Upload Image
           </button>

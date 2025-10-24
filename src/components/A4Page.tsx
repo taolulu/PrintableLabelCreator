@@ -15,9 +15,11 @@ export const A4Page: React.FC<A4PageProps> = ({ labels, projectName }) => {
         width: '210mm',
         height: '297mm',
         backgroundColor: 'white',
-        boxShadow: '0 0 10px rgba(0,0,0,0.1)',
         position: 'relative',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        margin: '0 auto',
       }}
+      className="print:shadow-none"
     >
       {labels.map((label, index) => {
         const rowIndex = Math.floor(index / 2);
