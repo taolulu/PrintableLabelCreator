@@ -329,20 +329,20 @@ export default function App(): React.ReactElement {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col xl:grid xl:grid-cols-3 gap-4 xl:gap-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="responsive-editor-layout px-4 sm:px-6 lg:px-8">
           {/* Left side: Controls */}
-          <div className="xl:col-span-1 flex flex-col gap-4 xl:gap-8">
-            <div className="bg-white rounded-lg shadow-md p-4 flex flex-col gap-4">
+          <div className="responsive-editor-sidebar flex flex-col gap-4 p-4">
+            <div className="p-4 flex flex-col gap-4 border-b border-gray-200">
               <h2 className="text-lg xl:text-xl font-bold text-gray-800">My Labels</h2>
               <div className="flex gap-2">
-                <button onClick={exportProject} className="flex-1 text-sm px-3 py-2 bg-white border rounded hover:bg-gray-50">Export</button>
-                <button onClick={() => fileInputRef.current?.click()} className="flex-1 text-sm px-3 py-2 bg-white border rounded hover:bg-gray-50">Import</button>
+                <button onClick={exportProject} className="flex-1 text-sm px-3 py-2 bg-gray-100 border rounded hover:bg-gray-200">Export</button>
+                <button onClick={() => fileInputRef.current?.click()} className="flex-1 text-sm px-3 py-2 bg-gray-100 border rounded hover:bg-gray-200">Import</button>
                 <input ref={fileInputRef} type="file" accept="application/json" onChange={handleImportFile} className="hidden" />
               </div>
               {/* Labels list removed from left panel — preview area now contains controls */}
               <button
                 onClick={handleAddLabel}
-                className="w-full mt-2 bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 transition-colors"
+                className="w-full mt-2 bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
               >
                 Add Label
               </button>
@@ -357,17 +357,17 @@ export default function App(): React.ReactElement {
                 updateSelectedLabel={handleUpdateSelectedLabel}
               />
             ) : (
-              <div className="w-full text-center text-gray-500 bg-white p-6 xl:p-8 rounded-lg shadow-md">
+              <div className="w-full text-center text-gray-500 p-6 xl:p-8 border border-gray-200 rounded-lg bg-gray-50">
                 Select a label to edit or add a new one.
               </div>
             )}
-             <button onClick={() => setIsPrintPreview(true)} className="w-full bg-blue-600 text-white font-bold py-3 xl:py-4 px-4 xl:px-6 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors text-base xl:text-lg">
+             <button onClick={() => setIsPrintPreview(true)} className="w-full bg-green-600 text-white font-bold py-3 xl:py-4 px-4 xl:px-6 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-colors text-base xl:text-lg mt-4">
               Go to Print Preview
             </button>
           </div>
 
           {/* Right side: All Labels Preview */}
-          <div className="xl:col-span-2 bg-gray-50 rounded-lg shadow-inner p-4 sm:p-6 xl:p-8 overflow-auto flex flex-col items-center">
+          <div className="responsive-editor-preview bg-gray-50 rounded-lg shadow-inner p-4 sm:p-6 xl:p-8 overflow-auto flex flex-col items-center">
             <div
               className="origin-top transform-gpu"
               style={{

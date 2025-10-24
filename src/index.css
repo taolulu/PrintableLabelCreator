@@ -115,3 +115,97 @@
   background: rgba(0,0,0,0.15);
   border-radius: 8px;
 }
+
+
+/* 响应式布局 - 基于宽高比例的媒体查询 */
+
+/* 横向屏幕布局 (宽高比 >= 1) */
+@media (min-aspect-ratio: 1/1) {
+  .responsive-editor-layout {
+    display: flex;
+    flex-direction: row;
+    max-width: 1440px;
+    margin: 0 auto;
+    gap: 24px;
+    transition: all 0.3s ease-in-out;
+    align-items: flex-start;
+  }
+  
+  .responsive-editor-sidebar {
+    width: 300px;
+    min-width: 300px;
+    flex-shrink: 0;
+    min-height: 600px;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .responsive-editor-preview {
+    flex: 1;
+    min-height: 600px;
+    transition: all 0.3s ease-in-out;
+  }
+}
+
+/* 竖向屏幕布局 (宽高比 < 1) */
+@media (max-aspect-ratio: 1/1) {
+  .responsive-editor-layout {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 20px;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .responsive-editor-sidebar {
+    width: 100%;
+    order: 2;
+    min-height: 400px;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .responsive-editor-preview {
+    width: 100%;
+    order: 1;
+    min-height: 500px;
+    transition: all 0.3s ease-in-out;
+  }
+}
+
+/* 小屏幕优化 */
+@media (max-width: 768px) {
+  .responsive-editor-layout {
+    gap: 16px;
+  }
+  
+  .responsive-editor-sidebar {
+    min-height: 350px;
+  }
+  
+  .responsive-editor-preview {
+    min-height: 400px;
+  }
+}
+
+/* 通用样式 */
+.responsive-editor-sidebar,
+.responsive-editor-preview {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* 平滑过渡效果 */
+.responsive-editor-layout * {
+  transition: width 0.3s ease-in-out, height 0.3s ease-in-out, flex 0.3s ease-in-out;
+}
+
+/* 确保内容不会溢出 */
+.responsive-editor-sidebar {
+  overflow-y: auto;
+}
+
+.responsive-editor-preview {
+  overflow-x: auto;
+  overflow-y: auto;
+}
