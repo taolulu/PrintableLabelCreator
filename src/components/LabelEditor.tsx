@@ -69,15 +69,49 @@ export function LabelEditor({
     if (file) {
       (async () => {
         try {
+          // If IndexedDB is not available, fall back to data URL path
+          if (typeof indexedDB === 'undefined') throw new Error('IndexedDB not available');
           const id = await saveImageBlob(file);
           updateSelectedLabel({ imageUrl: `idb://${id}` }, selectedLabel.id);
-        } catch (e) {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const result = reader.result as string | null;
-            if (result) updateSelectedLabel({ imageUrl: result }, selectedLabel.id);
-          };
-          reader.readAsDataURL(file);
+        } catch (err) {
+          // Fallback: read file as data URL and store in label.imageUrl (safe preview)
+          // Protect against extremely large files by checking size first
+          try {
+            const MAX_BYTES = 2_000_000; // 2MB
+            if (file.size > MAX_BYTES) {
+              // For very large images avoid inlining into state/localStorage — show an alert and stop
+              // eslint-disable-next-line no-console
+              console.warn('File too large to inline; skipping persistence.');
+              const reader = new FileReader();
+              reader.onload = () => {
+                const result = reader.result as string | null;
+                if (result) updateSelectedLabel({ imageUrl: result }, selectedLabel.id);
+              };
+              reader.onerror = () => {
+                // eslint-disable-next-line no-console
+                console.error('Failed to read large file');
+                alert('Failed to read image file. Try a smaller image.');
+              };
+              reader.readAsDataURL(file);
+              return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => {
+              const result = reader.result as string | null;
+              if (result) updateSelectedLabel({ imageUrl: result }, selectedLabel.id);
+            };
+            reader.onerror = (e) => {
+              // eslint-disable-next-line no-console
+              console.error('FileReader error', e);
+              alert('Failed to read image file');
+            };
+            reader.readAsDataURL(file);
+          } catch (inner) {
+            // eslint-disable-next-line no-console
+            console.error('Upload fallback failed', inner);
+            alert('Upload failed');
+          }
         }
       })();
     }

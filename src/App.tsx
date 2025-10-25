@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Label } from "./components/Label";
 import { LabelEditor } from "./components/LabelEditor";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { A4Page } from "./components/A4Page";
 import { stripHtmlTags } from "./components/ui/utils";
 import { saveImageBlob, getImageBlob } from './lib/idbImages';
@@ -342,13 +343,15 @@ export default function App(): React.ReactElement {
             </div>
 
             {selectedLabel ? (
-              <LabelEditor
-                key={selectedLabel.id}
-                projectName={projectName}
-                setProjectName={setProjectName}
-                selectedLabel={selectedLabel}
-                updateSelectedLabel={handleUpdateSelectedLabel}
-              />
+              <ErrorBoundary>
+                <LabelEditor
+                  key={selectedLabel.id}
+                  projectName={projectName}
+                  setProjectName={setProjectName}
+                  selectedLabel={selectedLabel}
+                  updateSelectedLabel={handleUpdateSelectedLabel}
+                />
+              </ErrorBoundary>
             ) : (
               <div className="w-full text-center text-gray-500 bg-white p-8 rounded-lg shadow-md">
                 Select a label to edit or add a new one.
